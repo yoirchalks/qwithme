@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -12,4 +6,92 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model patients {
+  id                Int       @id @default(autoincrement())
+  full_name         String
+  address           String?
+  contact_number    String?
+  email_address     String?
+  image             Bytes?
+  chronic_diagnosis String?
+  dr_id             Int?
+  created_at        DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime? @db.Timestamptz(6)
+  staff             staff?    @relation(fields: [dr_id], references: [id], onUpdate: NoAction, map: "fk_dr_id")
+  ques              ques[]
+}
+
+model ques {
+  id             Int         @id @default(autoincrement())
+  patient_id     Int
+  staff_id       Int
+  room_id        Int
+  queue_number   Int
+  status         que_status? @default(waiting)
+  sign_in_time   DateTime?   @default(now()) @db.Timestamptz(6)
+  started_time   DateTime?   @db.Timestamptz(6)
+  completed_time DateTime?   @db.Timestamptz(6)
+  created_at     DateTime?   @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?   @db.Timestamptz(6)
+  patients       patients    @relation(fields: [patient_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  rooms          rooms       @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  staff          staff       @relation(fields: [staff_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model rooms {
+  id          Int           @id @default(autoincrement())
+  room_number String        @db.VarChar(50)
+  room_name   String?       @db.VarChar(100)
+  room_type   String?       @db.VarChar(50)
+  created_at  DateTime?     @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime?     @db.Timestamptz(6)
+  ques        ques[]
+  staff_rooms staff_rooms[]
+}
+
+model staff {
+  id               Int            @id @default(autoincrement())
+  full_name        String
+  position         staff_position
+  image            Bytes?
+  years_of_service Int?           @db.SmallInt
+  monthly_wages    Decimal?       @db.Money
+  created_at       DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime?      @db.Timestamptz(6)
+  patients         patients[]
+  ques             ques[]
+  staff_rooms      staff_rooms[]
+}
+
+model staff_rooms {
+  id            Int       @id @default(autoincrement())
+  staff_id      Int
+  room_id       Int
+  sign_in_date  DateTime  @db.Date
+  sign_in_time  DateTime? @default(now()) @db.Timestamptz(6)
+  sign_out_time DateTime? @db.Timestamptz(6)
+  rooms         rooms     @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  staff         staff     @relation(fields: [staff_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([staff_id, room_id, sign_in_date], map: "unique_staff_room_day")
+}
+
+enum que_status {
+  waiting
+  being_seen
+  done
+  cancelled
+}
+
+enum staff_position {
+  doctor
+  pa
+  nurse
+  secretary
+  IT
+  maintenance
+  manager
 }
