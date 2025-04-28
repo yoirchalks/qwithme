@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-middlewares()
+middlewares(app)
 
 
 const port = process.env.PORT || 3000;
