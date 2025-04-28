@@ -194,7 +194,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\יהודית\\Desktop\\programming\\qwithme\\generated\\prisma",
+      "value": "C:\\Users\\yoirc\\OneDrive\\Documents\\qwithme\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -208,12 +208,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\יהודית\\Desktop\\programming\\qwithme\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\yoirc\\OneDrive\\Documents\\qwithme\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../.env",
-    "schemaEnvPath": "../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../prisma",
   "clientVersion": "6.6.0",
