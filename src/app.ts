@@ -1,13 +1,11 @@
 import express from "express";
-import cors from "cors";
-import helmet from "helmet";
+import middlewares from "./startup/headers";
 import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(helmet());
-app.use(express.json());
+middlewares()
+
 
 const port = process.env.PORT || 3000;
 
