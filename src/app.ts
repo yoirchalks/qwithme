@@ -5,8 +5,8 @@ import routes from "./startup/routes";
 dotenv.config();
 
 const app = express();
-middlewares()
-routes(app)
+middlewares(app)
+
 
 const port = process.env.PORT || 3000;
 
