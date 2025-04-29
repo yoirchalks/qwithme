@@ -3,6 +3,7 @@ import middlewares from "./startup/headers";
 import dotenv from "dotenv";
 import routes from "./startup/routes";
 dotenv.config();
+import 'express-async-errors'
 
 const app = express();
 middlewares(app)
