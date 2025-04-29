@@ -2,6 +2,7 @@ import express from "express";
 import middlewares from "./startup/headers";
 import dotenv from "dotenv";
 dotenv.config();
+import 'express-async-errors'
 
 const app = express();
 middlewares(app)
