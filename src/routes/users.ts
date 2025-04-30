@@ -12,7 +12,11 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.post("/", async (req: Request, res: Response) => {
   const result = validateUser(req.body);
-  if (!result.success) throw new CustomError(400, `${result.field} is ${result.message?.toLowerCase()}`);
+  if (!result.success)
+    throw new CustomError(
+      400,
+      `${result.field} is ${result.message?.toLowerCase()}`
+    );
   const {
     fullName,
     address,
@@ -47,8 +51,31 @@ router.post("/", async (req: Request, res: Response) => {
     },
   });
   console.log(patient);
-  
-  res.send(patient)
+
+  res.send(patient);
+});
+
+router.get("/:id", async (req: Request, res: Response) => {
+  const patientId = parseInt(req.params.id);
+  const patient = await prisma.patients.findUnique({
+    where: {
+      id: patientId,
+    },
+  });
+  if (!patient)
+    throw new CustomError(400, `customer with id ${patientId} not found`);
+  res.send(patient);
+});
+
+router.put("/:id", async (req: Request, res: Response) => {
+  const patientId = parseInt(req.params.id);
+
+  prisma.patients.update({
+    where: {
+      id: patientId,
+    },
+    data: {},
+  });
 });
 
 export default router;
