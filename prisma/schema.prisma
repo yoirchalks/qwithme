@@ -13,15 +13,15 @@ model patients {
   full_name         String
   address           String
   contact_number    String?
-  email_address     String? @unique
+  email_address     String?   @unique
   image             Bytes?
   chronic_diagnosis String?
   dr_id             Int
   created_at        DateTime? @default(now()) @db.Timestamptz(6)
   updated_at        DateTime? @db.Timestamptz(6)
-  staff             staff?    @relation(fields: [dr_id], references: [id], onUpdate: NoAction, map: "fk_dr_id")
+  staff             staff     @relation(fields: [dr_id], references: [id], onUpdate: NoAction, map: "fk_dr_id")
   ques              ques[]
-  @@unique([contact_number, full_name])
+  @@unique([full_name, contact_number])
 }
 
 model ques {
@@ -29,7 +29,7 @@ model ques {
   patient_id     Int
   staff_id       Int
   room_id        Int
-  queue_number   Int
+  queue_number   Int        @unique
   status         que_status? @default(waiting)
   sign_in_time   DateTime?   @default(now()) @db.Timestamptz(6)
   started_time   DateTime?   @db.Timestamptz(6)
@@ -44,8 +44,8 @@ model ques {
 model rooms {
   id          Int           @id @default(autoincrement())
   room_number String        @db.VarChar(50) @unique
-  room_name   String       @db.VarChar(100) @unique
-  room_type   String      @db.VarChar(50)
+  room_name   String        @db.VarChar(100) @unique
+  room_type   String        @db.VarChar(50)
   created_at  DateTime?     @default(now()) @db.Timestamptz(6)
   updated_at  DateTime?     @db.Timestamptz(6)
   ques        ques[]
@@ -54,11 +54,11 @@ model rooms {
 
 model staff {
   id               Int            @id @default(autoincrement())
-  full_name        String @unique
+  full_name        String         @unique
   position         staff_position
-  image            Bytes
-  years_of_service Int           @db.SmallInt
-  monthly_wages    Decimal       @db.Money
+  image            Bytes?
+  years_of_service Int            @db.SmallInt
+  monthly_wages    Decimal        @db.Money
   created_at       DateTime?      @default(now()) @db.Timestamptz(6)
   updated_at       DateTime?      @db.Timestamptz(6)
   patients         patients[]
