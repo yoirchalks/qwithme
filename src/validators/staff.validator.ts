@@ -26,7 +26,7 @@ const schema = z.object({
   monthlyWages: z.pipeline(stringToNum, z.number().max(100000)),  
 });
 
-export default function validateUser(body: unknown) {
+export default function validateStaff(body: unknown) {
   const result = schema.safeParse(body);
   if (!result.success)
     return {
