@@ -12,7 +12,7 @@ CREATE TABLE "patients" (
     "contact_number" TEXT,
     "email_address" TEXT,
     "image" BYTEA,
-    "chronic_diagnosis" TEXT,
+    "chronic_diagnosis" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "dr_id" INTEGER NOT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6),
@@ -74,6 +74,24 @@ CREATE TABLE "staff_rooms" (
 
     CONSTRAINT "staff_rooms_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "patients_email_address_key" ON "patients"("email_address");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "patients_full_name_contact_number_key" ON "patients"("full_name", "contact_number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ques_queue_number_key" ON "ques"("queue_number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "rooms_room_number_key" ON "rooms"("room_number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "rooms_room_name_key" ON "rooms"("room_name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "staff_full_name_key" ON "staff"("full_name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "unique_staff_room_day" ON "staff_rooms"("staff_id", "room_id", "sign_in_date");
