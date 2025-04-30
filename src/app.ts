@@ -4,7 +4,7 @@ import middlewares from "./startup/headers";
 import dotenv from "dotenv";
 import routes from "./startup/routes";
 dotenv.config();
-import {errorHandler} from "./middlewares/errorHandling";
+import { errorHandler } from "./middlewares/errorHandling";
 
 const app = express();
 middlewares(app)
