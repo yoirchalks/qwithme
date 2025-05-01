@@ -5,8 +5,11 @@ import dotenv from "dotenv";
 import routes from "./startup/routes";
 dotenv.config();
 import { errorHandler } from "./middlewares/errorHandling";
+import setUpSockets from "./startup/sockets";
+
 
 const app = express();
+const server = setUpSockets(app)
 middlewares(app)
 routes(app)
 app.use(errorHandler)
@@ -14,7 +17,7 @@ app.use(errorHandler)
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`server listening @ port ${port}`);
 });
 
