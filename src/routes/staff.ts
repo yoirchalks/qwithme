@@ -21,10 +21,11 @@ router.post("/", async (req: Request, res: Response) => {
       400,
       `${result.field} is ${result.message?.toLowerCase()}`
     );
-  const { fullName, position, yearsOfService, monthlyWages, image } = result.body!;
-  let bytes
-  if(image) {
-    bytes = Buffer.from(image!, 'base64')
+  const { fullName, position, yearsOfService, monthlyWages, image } =
+    result.body!;
+  let bytes;
+  if (image) {
+    bytes = Buffer.from(image!, "base64");
   }
   const staff = await prisma.staff.create({
     data: {
@@ -32,7 +33,7 @@ router.post("/", async (req: Request, res: Response) => {
       position: position!,
       years_of_service: yearsOfService!,
       monthly_wages: monthlyWages!,
-      image: bytes!
+      image: bytes!,
     },
   });
   const cleanedResult = cleanResult(staff, clean);
@@ -56,18 +57,18 @@ router.put("/:id", async (req: Request, res: Response) => {
   const staffId = parseInt(req.params.id);
 
   let findStaff = await prisma.staff.findUnique({
-    where:{
-      id: staffId
-    }
-  })
+    where: {
+      id: staffId,
+    },
+  });
 
-  if(!findStaff){
-    res.status(404).send(`staff with id ${staffId} not found`)
-    return
+  if (!findStaff) {
+    res.status(404).send(`staff with id ${staffId} not found`);
+    return;
   }
 
   const data = cleanInputData(req.body);
- 
+
   const result = validateStaff("put", data);
 
   if (!result.success)
@@ -76,11 +77,11 @@ router.put("/:id", async (req: Request, res: Response) => {
       `${result.field} is ${result.message?.toLowerCase()}`
     );
 
-    const updateData: Record<string, any> = { ...result.body! };
+  const updateData: Record<string, any> = { ...result.body! };
 
-    if (typeof req.body.image === "string" && req.body.image.length > 0) {
-      updateData.image = Buffer.from(req.body.image, "base64");
-    }
+  if (typeof req.body.image === "string" && req.body.image.length > 0) {
+    updateData.image = Buffer.from(req.body.image, "base64");
+  }
 
   const staff = await prisma.staff.update({
     where: {
@@ -89,38 +90,35 @@ router.put("/:id", async (req: Request, res: Response) => {
     data: updateData,
   });
 
-  console.log(staff);
-  
-
   findStaff = await prisma.staff.findUnique({
-    where:{
-      id: staffId
-    }
-  })
+    where: {
+      id: staffId,
+    },
+  });
 
   const cleanStaff = cleanResult(staff, clean);
   res.send(cleanStaff);
 });
 
-router.delete('/:id', async(req: Request, res: Response)=>{
-  const id = parseInt(req.params.id)
+router.delete("/:id", async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
   const staff = await prisma.staff.findUnique({
-    where:{
-      id: id
-    }
-  })
-  
-  if(!staff) {
-    res.status(400).send(`no staff member found with id ${req.params.id}`)
-    return
+    where: {
+      id: id,
+    },
+  });
+
+  if (!staff) {
+    res.status(400).send(`no staff member found with id ${req.params.id}`);
+    return;
   }
   await prisma.staff.delete({
-    where:{
-      id: parseInt(req.params.id)
-    }
-  })
-  const cleanedResult = cleanResult(staff, clean)
-  res.send(cleanedResult)
-})
+    where: {
+      id: parseInt(req.params.id),
+    },
+  });
+  const cleanedResult = cleanResult(staff, clean);
+  res.send(cleanedResult);
+});
 
 export default router;
