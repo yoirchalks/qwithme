@@ -2,8 +2,10 @@ import express, { Request, Response } from "express";
 import { prisma } from "../db/prisma";
 import validateUser from "../validators/users.validator";
 import { CustomError } from "../utils/CustomError";
+import { cleanResult } from "../utils/cleanResults";
 
 const router = express.Router();
+const clean = ['created_at', 'updated_at']
 
 router.get("/", async (req: Request, res: Response) => {
   const result = await prisma.patients.findMany();
@@ -54,9 +56,9 @@ router.post("/", async (req: Request, res: Response) => {
       dr_id: drId,
     },
   });
-  console.log(patient);
+  const cleanedPatient = cleanResult(patient, clean )
 
-  res.send(patient);
+  res.send(cleanedPatient);
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
