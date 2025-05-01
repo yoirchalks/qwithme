@@ -2,14 +2,15 @@ import express, { Request, Response } from "express";
 import { prisma } from "../db/prisma";
 import validateUser from "../validators/users.validator";
 import { CustomError } from "../utils/CustomError";
-import { cleanResult } from "../utils/cleanResults";
+import { cleanResult, cleanResults } from "../utils/cleanResults";
 
 const router = express.Router();
 const clean = ['created_at', 'updated_at']
 
 router.get("/", async (req: Request, res: Response) => {
   const result = await prisma.patients.findMany();
-  res.send(result);
+  const cleanedPatients = cleanResults(result, clean)
+  res.send(cleanedPatients);
 });
 
 router.post("/", async (req: Request, res: Response) => {
@@ -70,7 +71,9 @@ router.get("/:id", async (req: Request, res: Response) => {
   });
   if (!patient)
     throw new CustomError(400, `customer with id ${patientId} not found`);
-  res.send(patient);
+  const cleanedPatient = cleanResult(patient, clean )
+
+  res.send(cleanedPatient);
 });
 
 router.put("/:id", async (req: Request, res: Response) => {
