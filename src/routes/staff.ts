@@ -109,7 +109,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
   });
 
   if (!staff) {
-    res.status(400).send(`no staff member found with id ${req.params.id}`);
+    res.status(404).send(`no staff member found with id ${req.params.id}`);
     return;
   }
   await prisma.staff.delete({

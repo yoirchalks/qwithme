@@ -71,7 +71,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     },
   });
   if (!patient)
-    throw new CustomError(400, `customer with id ${patientId} not found`);
+    throw new CustomError(404, `patient with id ${patientId} not found`);
   const cleanedPatient = cleanResult(patient, clean )
 
   res.send(cleanedPatient);
@@ -115,5 +115,26 @@ router.put("/:id", async (req: Request, res: Response) => {
   const cleanedPatient = cleanResult(updatedPatient, clean)
   res.send(cleanedPatient)
 });
+
+router.delete('/:id', async(req: Request, res: Response)=>{
+  const id = parseInt(req.params.id);
+    const staff = await prisma.patients.findUnique({
+      where: {
+        id: id,
+      },
+    });
+  
+    if (!staff) {
+      res.status(400).send(`no patient found with id ${req.params.id}`);
+      return;
+    }
+    await prisma.patients.delete({
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    const cleanedResult = cleanResult(staff, clean);
+    res.send(cleanedResult);
+})
 
 export default router;
