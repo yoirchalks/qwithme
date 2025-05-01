@@ -8,6 +8,8 @@ export function errorHandler(
   res: Response,
   next: NextFunction
 ) {
+  console.log(err);
+  
   if (
     err instanceof Prisma.PrismaClientKnownRequestError &&
     err.code === "P2002"
@@ -26,5 +28,5 @@ export function errorHandler(
    return
   }
 
-  res.status(500).send("Internal server error");
+  res.status(500).send(`Internal server error; ${err}`);
 }
