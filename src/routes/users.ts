@@ -26,6 +26,10 @@ router.post("/", async (req: Request, res: Response) => {
     chronicDiagnoses,
     drId,
   } = req.body;
+  let bytes;
+  if (image) {
+    bytes = Buffer.from(image!, "base64");
+  }
   const doctor = await prisma.staff.findFirst({
     where: {
       id: drId,
@@ -44,7 +48,7 @@ router.post("/", async (req: Request, res: Response) => {
       full_name: fullName,
       address,
       contact_number: contactNumber,
-      image,
+      image: bytes,
       email_address: emailAddress,
       chronic_diagnosis: chronicDiagnoses,
       dr_id: drId,
