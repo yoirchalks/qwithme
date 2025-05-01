@@ -47,7 +47,7 @@ const putSchema = z.object({
   monthlyWages: z.pipeline(stringToNum, z.number().max(100000)).optional(),  
 });
 
-export default function validateStaff(method:'post'| 'put', body: unknown) {
+export default function validateStaff(method:'post'| 'put', body: object) {
   const result = (method === 'post') ? postSchema.safeParse(body) : putSchema.safeParse(body)
   if (!result.success)
     return {
