@@ -3,6 +3,7 @@ import { prisma } from "../db/prisma";
 import validateUser from "../validators/users.validator";
 import { CustomError } from "../utils/CustomError";
 import { cleanResult, cleanResults } from "../utils/cleanResults";
+import cleanInputData from "../utils/cleanInputData";
 
 const router = express.Router();
 const clean = ['created_at', 'updated_at']
@@ -14,7 +15,7 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 router.post("/", async (req: Request, res: Response) => {
-  const result = validateUser(req.body);
+  const result = validateUser('post', req.body);
   if (!result.success)
     throw new CustomError(
       400,
@@ -78,13 +79,41 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 router.put("/:id", async (req: Request, res: Response) => {
   const patientId = parseInt(req.params.id);
+  let patient = prisma.patients.findUnique({
+    where: {
+      id: patientId
+    }
+  })
+  if(!patient){
+    res.status(404).send(`patient with  id ${patientId} not found`)
+    return
+  }
 
-  prisma.patients.update({
+  const data = cleanInputData(req.body)
+
+  const result = validateUser('put', data)
+
+  if (!result.success)
+    throw new CustomError(
+      400,
+      `${result.field} is ${result.message?.toLowerCase()}`
+    );
+
+  const updateData: Record<string, any> = { ...result.body! };
+
+  if (typeof req.body.image === "string" && req.body.image.length > 0) {
+    updateData.image = Buffer.from(req.body.image, "base64");
+  }
+
+  const updatedPatient = await prisma.patients.update({
     where: {
       id: patientId,
     },
-    data: {},
+    data: updateData,
   });
+
+  const cleanedPatient = cleanResult(updatedPatient, clean)
+  res.send(cleanedPatient)
 });
 
 export default router;
