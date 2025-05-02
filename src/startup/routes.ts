@@ -5,10 +5,10 @@ import quesRoute from '../routes/ques'
 import signInRoute from '../routes/signIns'
 
 function routes (app: Express): void{
-app.use('/users', usersRouter)
-app.use('/staff', staffRouter)
-app.use('/ques', quesRoute)
-app.use('/signIns', signInRoute)
+app.use('/api/users', usersRouter)
+app.use('/api/staff', staffRouter)
+app.use('/api/ques', quesRoute)
+app.use('/api/signIns', signInRoute)
 }
 
 export default routes
