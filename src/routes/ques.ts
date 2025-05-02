@@ -1,6 +1,8 @@
 import express, { Request, Response } from "express";
 import { prisma } from "../db/prisma";
 import { isInteger } from "lodash";
+import validateQue from "../validators/ques.validator";
+import { CustomError } from "../utils/CustomError";
 
 const router = express.Router();
 
@@ -30,6 +32,10 @@ router.get('/', async(req: Request, res: Response)=>{
     res.send(results)
 })
 
+router.post('/', async(req: Request, res: Response)=>{
+    
+})
+
 router.get('/:id', async(req: Request, res: Response)=>{
      const id = parseInt(req.params.id);
       const que = await prisma.ques.findUnique({
@@ -47,11 +53,12 @@ router.get('/:id', async(req: Request, res: Response)=>{
 })
 
 router.put('/:id', async(req: Request, res: Response)=>{
+    const result = validateQue('post', req.body);
+    if(!result.success) throw new CustomError(400, `${result.field} is ${result.message?.toLowerCase()}`)
     
-})
+    const {patientId, roomId, staffId} = req.body;
 
-router.post('/', async(req: Request, res: Response)=>{
-    
+    const queNumber = prisma.ques
 })
 
 export default router;
