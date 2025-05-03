@@ -1,6 +1,7 @@
 // src/middleware/errorHandler.ts
 import { Request, Response, NextFunction } from "express";
 import { Prisma } from "@prisma/client";
+import { log } from "console";
 
 export function errorHandler(
   err: any,
@@ -8,7 +9,7 @@ export function errorHandler(
   res: Response,
   next: NextFunction
 ) {
-  console.log(err);
+  console.log(err);  
   
   if (
     err instanceof Prisma.PrismaClientKnownRequestError &&

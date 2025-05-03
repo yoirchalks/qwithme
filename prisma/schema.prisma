@@ -68,7 +68,7 @@ model staff {
 
 model staff_rooms {
   id            Int       @id @default(autoincrement())
-  staff_id      Int
+  staff_id      Int       @unique
   room_id       Int
   sign_in_date  DateTime  @db.Date
   sign_in_time  DateTime? @default(now()) @db.Timestamptz(6)
