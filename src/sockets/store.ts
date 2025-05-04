@@ -24,6 +24,24 @@ export function deleteUser(userId: string) {
 export function getAllUsers() {
   return Array.from(usersStore.values());
 }
+
 export function deleteAllUsers() {
   return usersStore.clear();
+}
+
+export function getUsersByRole(role: userRole): userInfo[] {
+  return Array.from(usersStore.values()).filter((user) => user.role === role);
+}
+
+export function getUsersByRoom(room: string): userInfo[] {
+  return Array.from(usersStore.values()).filter((user) => user.room === room);
+}
+
+export function getUsersByRoomAndRole(
+  room: string,
+  role: userRole
+): userInfo[] {
+  return Array.from(usersStore.values()).filter(
+    (user) => user.room === room && user.role === role
+  );
 }
