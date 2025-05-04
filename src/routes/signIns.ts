@@ -9,10 +9,7 @@ const router = express.Router();
 
 router.post("/", async (req: Request, res: Response) => {
   const attempt = req.body.attempt;
-  if (attempt != 'doctor' && attempt != 'patient') {
-    res.status(400).send(`must contain attempt field set to either "doctor" or "patient"`)
-    return
-  }
+  if (attempt != 'doctor' && attempt != 'patient') throw new CustomError(400, `must contain field "attempt" set to "doctor" or patient"`)
 
   if (attempt === "doctor") {
     const result = validateSignIn("staff", req.body);
@@ -23,6 +20,16 @@ router.post("/", async (req: Request, res: Response) => {
       );
     }
     const roomAssignment = await assignRoom(req.body.staffId);
+    
+    const io = getIO();
+    const socket = io.sockets.sockets.get(req.body.socketId);
+    const roomDetails = await prisma?.rooms.findUnique({
+      where:{
+        id: roomAssignment.id
+      }
+    })
+    socket?.join([`${roomAssignment.room_id.toString()}`, 'staff'])
+    socket?.emit("room_assignment", `you have been  assigned room ${roomDetails?.room_number}`)
     res.send(roomAssignment);
   }
 
