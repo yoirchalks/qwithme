@@ -1,11 +1,11 @@
 import express from "express";
 import 'express-async-errors'
+import setUpSockets from "./startup/sockets";
 import middlewares from "./startup/headers";
 import dotenv from "dotenv";
 import routes from "./startup/routes";
 dotenv.config();
 import { errorHandler } from "./middlewares/errorHandling";
-import setUpSockets from "./startup/sockets";
 
 
 const app = express();

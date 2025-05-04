@@ -2,12 +2,13 @@ import { Express } from "express";
 import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { setupSocketIO } from "../sockets/socket";
+import { CustomError } from "../utils/CustomError";
 
 let io: SocketIOServer | null = null;
 
 export default function setUpSockets(app: Express): http.Server {
   const server = http.createServer(app);
-  const io = new SocketIOServer(server, {
+  io = new SocketIOServer(server, {
     cors: {
       origin: "http://127.0.0.1:5500",
       methods: ["GET", "PUT"],
@@ -20,7 +21,7 @@ export default function setUpSockets(app: Express): http.Server {
 
 export function getIO(): SocketIOServer {
     if (!io) {
-      throw new Error("Socket.IO not initialized yet!");
+      throw new CustomError(500, "Socket.IO not initialized yet!");
     }
     return io;
   }
