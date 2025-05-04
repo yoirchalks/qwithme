@@ -7,13 +7,11 @@ import routes from "./startup/routes";
 dotenv.config();
 import { errorHandler } from "./middlewares/errorHandling";
 
-
 const app = express();
 const server = setUpSockets(app)
 middlewares(app)
 routes(app)
 app.use(errorHandler)
-
 
 const port = process.env.PORT || 3000;
 
