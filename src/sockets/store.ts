@@ -17,6 +17,12 @@ export function getUser(userId: string) {
   return usersStore.get(userId);
 }
 
+export function getUserIdBySocket(socket: string) {
+  return Array.from(usersStore.values()).filter(
+    (user) => user.socketId === socket
+  )[0].userId;
+}
+
 export function deleteUser(userId: string) {
   usersStore.delete(userId);
 }
