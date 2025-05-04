@@ -1,20 +1,20 @@
 type userRole = "patient" | "staff";
 
 interface userInfo {
-  userId: string;
+  userId: number;
   role: userRole;
   socketId: string;
-  room: string;
+  roomNumber: string;
 }
 
 const usersStore = new Map<string, userInfo>();
 
-export function setUser(userId: string, info: userInfo) {
-  usersStore.set(userId, info);
+export function setUser(socketId: string, info: userInfo) {
+  usersStore.set(socketId, info);
 }
 
-export function getUser(userId: string) {
-  return usersStore.get(userId);
+export function getUser(socketId: string) {
+  return usersStore.get(socketId);
 }
 
 export function getUserIdBySocket(socket: string) {
@@ -23,8 +23,8 @@ export function getUserIdBySocket(socket: string) {
   )[0].userId;
 }
 
-export function deleteUser(userId: string) {
-  usersStore.delete(userId);
+export function deleteUser(socketId: string) {
+  usersStore.delete(socketId);
 }
 
 export function getAllUsers() {
@@ -39,15 +39,17 @@ export function getUsersByRole(role: userRole): userInfo[] {
   return Array.from(usersStore.values()).filter((user) => user.role === role);
 }
 
-export function getUsersByRoom(room: string): userInfo[] {
-  return Array.from(usersStore.values()).filter((user) => user.room === room);
+export function getUsersByRoom(roomNumber: string): userInfo[] {
+  return Array.from(usersStore.values()).filter(
+    (user) => user.roomNumber === roomNumber
+  );
 }
 
 export function getUsersByRoomAndRole(
-  room: string,
+  roomNumber: string,
   role: userRole
 ): userInfo[] {
   return Array.from(usersStore.values()).filter(
-    (user) => user.room === room && user.role === role
+    (user) => user.roomNumber === roomNumber && user.role === role
   );
 }

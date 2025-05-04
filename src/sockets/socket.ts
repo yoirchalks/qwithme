@@ -12,17 +12,16 @@ export function setupSocketIO(io: SocketIOServer) {
 
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
-      const userId = getUserIdBySocket(socket.id);
-      deleteUser(userId);
+      deleteUser(socket.id);
     });
   });
 
   process.on("SIGINT", () => {
     console.log("Server shutting down...");
-    deleteAllUsers(); // Cleanup all users
+    deleteAllUsers();
     io.close(() => {
       console.log("Socket server closed");
-      process.exit(0); // Exit the process
+      process.exit(0);
     });
   });
 }
