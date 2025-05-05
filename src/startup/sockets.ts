@@ -10,18 +10,18 @@ export default function setUpSockets(app: Express): http.Server {
   const server = http.createServer(app);
   io = new SocketIOServer(server, {
     cors: {
-      origin: "http://127.0.0.1:5500",
+      origin: "https://qwithme-frontend-mock.onrender.com",
       methods: ["GET", "PUT"],
     },
   });
 
   setupSocketIO(io);
-  return server
+  return server;
 }
 
 export function getIO(): SocketIOServer {
-    if (!io) {
-      throw new CustomError(500, "Socket.IO not initialized yet!");
-    }
-    return io;
+  if (!io) {
+    throw new CustomError(500, "Socket.IO not initialized yet!");
   }
+  return io;
+}
