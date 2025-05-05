@@ -31,7 +31,7 @@ router.post("/", async (req: Request, res: Response) => {
     const socket = io.sockets.sockets.get(req.body.socketId);
     const roomDetails = await prisma?.rooms.findUnique({
       where: {
-        id: roomAssignment.id,
+        id: roomAssignment.room_id,
       },
     });
     console.log(roomAssignment);
