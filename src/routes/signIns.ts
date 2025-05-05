@@ -25,6 +25,7 @@ router.post("/", async (req: Request, res: Response) => {
       );
     }
     const roomAssignment = await assignRoom(req.body.staffId);
+    console.log(roomAssignment);
 
     const io = getIO();
     const socket = io.sockets.sockets.get(req.body.socketId);
@@ -44,7 +45,6 @@ router.post("/", async (req: Request, res: Response) => {
       roomNumber: roomDetails!.room_number,
       userId: result.body!.staffId,
     });
-    console.log(getAllUsers());
     res.send(roomAssignment);
   }
 
