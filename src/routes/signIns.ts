@@ -34,6 +34,8 @@ router.post("/", async (req: Request, res: Response) => {
         id: roomAssignment.id,
       },
     });
+    console.log(roomAssignment);
+
     socket?.join([`${roomAssignment.room_id.toString()}`, "staff"]);
     socket?.emit(
       "room_assignment",
