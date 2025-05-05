@@ -1,5 +1,5 @@
 import { Server as SocketIOServer } from "socket.io";
-import { deleteAllUsers, deleteUser, getUserIdBySocket } from "./store";
+import { deleteAllUsers, deleteUser, getAllUsers } from "./store";
 
 export function setupSocketIO(io: SocketIOServer) {
   io.on("connection", (socket) => {
@@ -8,6 +8,10 @@ export function setupSocketIO(io: SocketIOServer) {
     socket.on("message", (data) => {
       console.log("Message received:", data);
       // handle the message
+    });
+
+    socket.on("get_list", () => {
+      socket.emit("send_patients", getAllUsers());
     });
 
     socket.on("disconnect", () => {
