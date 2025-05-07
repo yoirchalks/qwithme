@@ -2,9 +2,9 @@ type userRole = "patient" | "staff";
 
 interface userInfo {
   userId: number;
-  role: userRole;
+  role: userRole | null;
   socketId: string;
-  roomNumber: string;
+  roomNumber: string | null;
 }
 
 const usersStore = new Map<string, userInfo>();

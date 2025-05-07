@@ -59,7 +59,11 @@ router.post("/", async (req: Request, res: Response) => {
       );
     }
 
-    const que = await signInPatient(req.body.staffId, req.body.patientId);
+    const que = await signInPatient(
+      req.body.staffId,
+      req.body.patientId,
+      req.body.socketId
+    );
     const roomDetails = await prisma?.rooms.findUnique({
       where: {
         id: que.room_id,
