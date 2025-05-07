@@ -10,7 +10,7 @@ export default function setUpSockets(app: Express): http.Server {
   const server = http.createServer(app);
   io = new SocketIOServer(server, {
     cors: {
-      origin: "https://qwithme-frontend-mock.onrender.com",
+      origin: process.env.CORS,
       methods: ["GET", "PUT"],
     },
   });

@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/app.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/app.ts",
+    "dev": "cross-env NODE_ENV=dev nodemon --exec ts-node src/app.ts",
     "build": "tsc",
     "start": "nodemon dist/app.js"
   },
@@ -30,6 +30,7 @@
     "@types/express": "^5.0.1",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.14.1",
+    "cross-env": "^7.0.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }

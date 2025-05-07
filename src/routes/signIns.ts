@@ -60,13 +60,20 @@ router.post("/", async (req: Request, res: Response) => {
     }
 
     const que = await signInPatient(req.body.staffId, req.body.patientId);
+    const roomDetails = await prisma?.rooms.findUnique({
+      where: {
+        id: que.room_id,
+      },
+    });
     const io = getIO();
 
     const socket = io.sockets.sockets.get(req.body.socketId);
     socket?.join(que.room_id.toString());
     socket?.emit(
       "joined_que",
-      `you are number ${que.queue_number} in line for room ${que.room_id}`
+      `You are number ${que.queue_number} in line for room ${
+        roomDetails?.room_number
+      }.\n Expected wait time is ${que.queue_number * 15} minutes`
     );
 
     res.send(que);
