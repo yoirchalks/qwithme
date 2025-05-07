@@ -4,7 +4,7 @@ import validateSignIn from "../validators/signIns.validator";
 import { CustomError } from "../utils/CustomError";
 import signInPatient from "../utils/signInPatient";
 import { getIO } from "../startup/sockets";
-import { getAllUsers, setUser } from "../sockets/store";
+import { setUser } from "../sockets/store";
 
 const router = express.Router();
 
@@ -37,10 +37,7 @@ router.post("/", async (req: Request, res: Response) => {
     console.log(roomAssignment);
 
     socket?.join([`${roomAssignment.room_id.toString()}`, "staff"]);
-    socket?.emit(
-      "room_assignment",
-      `you have been  assigned room ${roomDetails?.room_number}`
-    );
+    socket?.send(`you have been  assigned room ${roomDetails?.room_number}`);
     setUser(req.body.socketId, {
       socketId: req.body.socketId,
       role: "staff",
