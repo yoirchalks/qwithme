@@ -4,6 +4,7 @@ import staffRouter from "../routes/staff";
 import quesRoute from "../routes/ques";
 import signInRoute from "../routes/signIns";
 import roomsRouter from "../routes/rooms";
+import signOutRouter from "../routes/signOut";
 
 function routes(app: Express): void {
   app.use("/api/users", usersRouter);
@@ -11,6 +12,7 @@ function routes(app: Express): void {
   app.use("/api/ques", quesRoute);
   app.use("/api/signIns", signInRoute);
   app.use("/api/rooms", roomsRouter);
+  app.use("/api/signOut", signOutRouter);
 }
 
 export default routes;
