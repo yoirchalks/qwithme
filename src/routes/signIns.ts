@@ -25,14 +25,18 @@ router.post("/", async (req: Request, res: Response) => {
         `${result.field} is ${result.message?.toLowerCase()}`
       );
     }
+<<<<<<< HEAD
     const id = req.body.staffId;
     console.log(id);
 
     const roomAssignment = await assignRoom(id);
+=======
+    const roomAssignment = await assignRoom(req.body.staffId);
+    console.log(roomAssignment);
+>>>>>>> parent of 16a5c0f (replaced all req.body.socketId with calls to getUserById)
 
     const io = getIO();
-    const socketId = getUserById(id).socketId;
-    const socket = io.sockets.sockets.get(socketId);
+    const socket = io.sockets.sockets.get(req.body.socketId);
     const roomDetails = await prisma?.rooms.findUnique({
       where: {
         id: roomAssignment.room_id,
@@ -42,8 +46,8 @@ router.post("/", async (req: Request, res: Response) => {
 
     socket?.join([`${roomAssignment.room_id.toString()}`, "staff"]);
     socket?.send(`you have been  assigned room ${roomDetails?.room_number}`);
-    setUser(socketId, {
-      socketId,
+    setUser(req.body.socketId, {
+      socketId: req.body.socketId,
       role: "staff",
       roomNumber: roomDetails!.room_number,
       userId: result.body!.staffId,
@@ -60,9 +64,11 @@ router.post("/", async (req: Request, res: Response) => {
       );
     }
 
-    const patientId = req.body.patientId;
-    const socketId = getUserById(patientId).socketId;
-    const que = await signInPatient(req.body.staffId, patientId, socketId);
+    const que = await signInPatient(
+      req.body.staffId,
+      req.body.patientId,
+      req.body.socketId
+    );
     const roomDetails = await prisma?.rooms.findUnique({
       where: {
         id: que.room_id,
@@ -70,7 +76,7 @@ router.post("/", async (req: Request, res: Response) => {
     });
     const io = getIO();
 
-    const socket = io.sockets.sockets.get(socketId);
+    const socket = io.sockets.sockets.get(req.body.socketId);
     socket?.join(que.room_id.toString());
     socket?.emit(
       "joined_que",
