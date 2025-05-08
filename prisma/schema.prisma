@@ -27,7 +27,7 @@ model patients {
 
 model ques {
   id             Int         @id @default(autoincrement())
-  patient_id     Int
+  patient_id     Int         @unique
   staff_id       Int
   room_id        Int
   queue_number   Int         @unique

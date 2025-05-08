@@ -78,7 +78,30 @@ router.put("", async (req: Request, res: Response) => {
     },
   });
   res.send(nextPatient);
-  console.log(prevPatient);
+});
+
+router.put("/:id", async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  console.log(id);
+
+  const que = await prisma.ques.findUnique({
+    where: {
+      patient_id: id,
+    },
+  });
+  if (!que)
+    throw new CustomError(404, `no que found for patient with id ${id}`);
+
+  const cancelledQue = await prisma.ques.update({
+    where: {
+      patient_id: id,
+    },
+    data: {
+      status: "cancelled",
+    },
+  });
+
+  res.send(cancelledQue);
 });
 
 export default router;

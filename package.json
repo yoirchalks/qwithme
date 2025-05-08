@@ -10,7 +10,8 @@
     "studio:dev": "dotenv -e env/dev.env -- npx prisma studio",
     "db:push": "dotenv -e env/dev.env -- npx prisma db push",
     "db:pull": "dotenv -e env/dev.env -- npx prisma db pull",
-    "generate": "dotenv -e env/dev.env -- npx prisma generate"
+    "generate": "dotenv -e env/dev.env -- npx prisma generate",
+    "db:migrate": "dotenv -e env/dev.env -- npx prisma migrate dev"
   },
   "keywords": [],
   "author": "",
