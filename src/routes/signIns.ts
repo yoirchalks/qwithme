@@ -4,7 +4,8 @@ import validateSignIn from "../validators/signIns.validator";
 import { CustomError } from "../utils/CustomError";
 import signInPatient from "../utils/signInPatient";
 import { getIO } from "../startup/sockets";
-import { setUser } from "../sockets/store";
+import { getUserById, setUser } from "../sockets/store";
+import { prisma } from "../db/prisma";
 
 const router = express.Router();
 
@@ -79,6 +80,59 @@ router.post("/", async (req: Request, res: Response) => {
 
     res.send(que);
   }
+});
+
+router.put("/:id", async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+
+  const io = getIO();
+  const socket = io.sockets.sockets.get(getUserById(id).socketId);
+
+  const signIn = await prisma.staff_rooms.findFirst({
+    where: {
+      staff_id: id,
+      sign_in_time: {
+        not: null,
+      },
+      sign_out_time: null,
+    },
+  });
+
+  if (!signIn) {
+    socket?.send("you are not currently logged in");
+    throw new CustomError(400, "you are not currently logged in");
+  }
+
+  const pendingQues = await prisma.ques.findMany({
+    where: {
+      staff_id: id,
+      completed_time: null,
+    },
+  });
+  if (pendingQues.length) {
+    socket?.send(
+      `You can't sign out. You still have ${pendingQues.length} ${
+        pendingQues.length > 1 ? "patients" : "patient"
+      } to see.`
+    );
+    throw new CustomError(
+      403,
+      `Unable to sign out whilst patients are waiting`
+    );
+  }
+
+  const signOut = await prisma.staff_rooms.update({
+    data: {
+      sign_out_time: new Date(),
+    },
+    where: {
+      staff_id: id,
+    },
+  });
+
+  socket?.send("signed out");
+
+  res.send(signOut);
 });
 
 export default router;
