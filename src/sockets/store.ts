@@ -39,6 +39,10 @@ export function getUsersByRole(role: userRole): userInfo[] {
   return Array.from(usersStore.values()).filter((user) => user.role === role);
 }
 
+export function getUserById(id: number) {
+  return getAllUsers().filter((user) => user.userId === id)[0];
+}
+
 export function getUsersByRoom(roomNumber: string): userInfo[] {
   return Array.from(usersStore.values()).filter(
     (user) => user.roomNumber === roomNumber
