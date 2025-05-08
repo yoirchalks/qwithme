@@ -25,7 +25,9 @@ router.post("/", async (req: Request, res: Response) => {
         `${result.field} is ${result.message?.toLowerCase()}`
       );
     }
-    const id = req.body.id;
+    const id = req.body.staffId;
+    console.log(id);
+
     const roomAssignment = await assignRoom(id);
 
     const io = getIO();
