@@ -68,7 +68,7 @@ router.put("", async (req: Request, res: Response) => {
     },
   });
 
-  const prevPatient = await prisma.ques.updateMany({
+  const prevPatient = await prisma.ques.updateManyAndReturn({
     where: {
       id: que.id - 1,
     },
