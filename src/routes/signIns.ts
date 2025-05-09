@@ -78,7 +78,6 @@ router.post("/", async (req: Request, res: Response) => {
       }.\n Expected wait time is ${que.queue_number * 15} minutes`
     );
     socket?.join(que.room_id.toString());
-
     res.send(que);
   }
 });
