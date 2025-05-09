@@ -6,6 +6,7 @@ import signInPatient from "../utils/signInPatient";
 import { getIO } from "../startup/sockets";
 import { getUserById, setUser } from "../sockets/store";
 import { prisma } from "../db/prisma";
+import sendMessage from "../utils/sendMessage";
 
 const router = express.Router();
 
@@ -25,27 +26,22 @@ router.post("/", async (req: Request, res: Response) => {
         `${result.field} is ${result.message?.toLowerCase()}`
       );
     }
-<<<<<<< HEAD
     const id = req.body.staffId;
-    console.log(id);
 
     const roomAssignment = await assignRoom(id);
-=======
-    const roomAssignment = await assignRoom(req.body.staffId);
-    console.log(roomAssignment);
->>>>>>> parent of 16a5c0f (replaced all req.body.socketId with calls to getUserById)
 
-    const io = getIO();
-    const socket = io.sockets.sockets.get(req.body.socketId);
     const roomDetails = await prisma?.rooms.findUnique({
       where: {
         id: roomAssignment.room_id,
       },
     });
-    console.log(roomAssignment);
 
+    const socket = sendMessage(
+      req.body.socketId,
+      `you have been assigned room ${roomDetails?.room_number}`
+    );
     socket?.join([`${roomAssignment.room_id.toString()}`, "staff"]);
-    socket?.send(`you have been  assigned room ${roomDetails?.room_number}`);
+
     setUser(req.body.socketId, {
       socketId: req.body.socketId,
       role: "staff",
@@ -74,16 +70,14 @@ router.post("/", async (req: Request, res: Response) => {
         id: que.room_id,
       },
     });
-    const io = getIO();
 
-    const socket = io.sockets.sockets.get(req.body.socketId);
-    socket?.join(que.room_id.toString());
-    socket?.emit(
-      "joined_que",
+    const socket = sendMessage(
+      req.body.socketId,
       `You are number ${que.queue_number} in line for room ${
         roomDetails?.room_number
       }.\n Expected wait time is ${que.queue_number * 15} minutes`
     );
+    socket?.join(que.room_id.toString());
 
     res.send(que);
   }
