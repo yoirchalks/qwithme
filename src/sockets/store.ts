@@ -39,6 +39,14 @@ export function getUsersByRole(role: userRole): userInfo[] {
   return Array.from(usersStore.values()).filter((user) => user.role === role);
 }
 
+export function getStaffById(id: number) {
+  return getUsersByRole("staff").filter((user) => user.userId === id)[0];
+}
+
+export function getPatientById(id: number) {
+  return getUsersByRole("patient").filter((user) => user.userId === id)[0];
+}
+
 export function getUserById(id: number) {
   return getAllUsers().filter((user) => user.userId === id)[0];
 }
