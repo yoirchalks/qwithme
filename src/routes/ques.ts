@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { prisma } from "../db/prisma";
-import validateQue from "../validators/ques.validator";
+import lateUpdate from "../utils/lateUpdate";
 import { CustomError } from "../utils/CustomError";
 
 const router = express.Router();
@@ -78,6 +78,24 @@ router.put("", async (req: Request, res: Response) => {
       completed_time: new Date(),
     },
   });
+
+  const delayInMin =
+    (nextPatient.started_time!.getMilliseconds() -
+      nextPatient.sign_in_time!.getMilliseconds()) /
+    (1000 * 60);
+
+  if (delayInMin > 60 && nextPatient) {
+    const staff = await prisma.staff.findUnique({
+      where: {
+        id: prevPatient[0].staff_id,
+      },
+    });
+    lateUpdate(
+      prevPatient[0].staff_id,
+      `${staff?.full_name} is running ${delayInMin} late. We are sorry for any inconvenience.`
+    );
+  }
+
   res.send(nextPatient);
 });
 
