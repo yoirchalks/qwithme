@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import { prisma } from "../db/prisma";
-import { isInteger } from "lodash";
 import validateQue from "../validators/ques.validator";
 import { CustomError } from "../utils/CustomError";
 
@@ -29,8 +28,6 @@ router.get("/", async (req: Request, res: Response) => {
   res.send(results);
 });
 
-router.post("/", async (req: Request, res: Response) => {});
-
 router.get("/:id", async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   const que = await prisma.ques.findUnique({
@@ -57,6 +54,10 @@ router.put("", async (req: Request, res: Response) => {
     res.send("no patients waiting");
     return;
   }
+
+  const existingQue = await prisma.ques.findUnique({
+    where: { id: que.id },
+  });
 
   const nextPatient = await prisma.ques.update({
     where: {
