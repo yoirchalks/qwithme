@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { prisma } from "../db/prisma";
 import lateUpdate from "../utils/lateUpdate";
 import { CustomError } from "../utils/CustomError";
+import { log } from "util";
 
 const router = express.Router();
 
@@ -43,7 +44,7 @@ router.get("/:id", async (req: Request, res: Response) => {
   res.send(que);
 });
 
-router.put("", async (req: Request, res: Response) => {
+router.put("/", async (req: Request, res: Response) => {
   const que = await prisma.ques.findFirst({
     where: {
       status: "waiting",
@@ -54,10 +55,6 @@ router.put("", async (req: Request, res: Response) => {
     res.send("no patients waiting");
     return;
   }
-
-  const existingQue = await prisma.ques.findUnique({
-    where: { id: que.id },
-  });
 
   const nextPatient = await prisma.ques.update({
     where: {
@@ -79,19 +76,27 @@ router.put("", async (req: Request, res: Response) => {
     },
   });
 
+  const waitingPatient = await prisma.ques.findUnique({
+    where: {
+      id: que.id + 1,
+    },
+  });
+
   const delayInMin =
-    (nextPatient.started_time!.getMilliseconds() -
-      nextPatient.sign_in_time!.getMilliseconds()) /
+    (nextPatient.started_time!.getTime() +
+      nextPatient.queue_number * 1000 * 60 * 15 -
+      nextPatient.sign_in_time!.getTime()) /
     (1000 * 60);
 
-  if (delayInMin > 60 && nextPatient) {
+  if (delayInMin > 2 && waitingPatient) {
     const staff = await prisma.staff.findUnique({
       where: {
-        id: prevPatient[0].staff_id,
+        id: nextPatient.staff_id,
       },
     });
+
     lateUpdate(
-      prevPatient[0].staff_id,
+      nextPatient.staff_id,
       `${staff?.full_name} is running ${delayInMin} late. We are sorry for any inconvenience.`
     );
   }
@@ -101,7 +106,6 @@ router.put("", async (req: Request, res: Response) => {
 
 router.put("/:id", async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
-  console.log(id);
 
   const que = await prisma.ques.findUnique({
     where: {
