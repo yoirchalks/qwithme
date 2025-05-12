@@ -5,11 +5,6 @@ export function setupSocketIO(io: SocketIOServer) {
   io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
 
-    socket.on("message", (data) => {
-      console.log("Message received:", data);
-      // handle the message
-    });
-
     socket.on("get_list", () => {
       socket.emit("send_patients", getAllUsers());
     });
