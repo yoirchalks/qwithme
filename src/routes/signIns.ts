@@ -19,6 +19,7 @@ router.post("/", async (req: Request, res: Response) => {
     );
 
   if (attempt === "doctor") {
+    
     const result = validateSignIn("staff", req.body);
     if (!result.success) {
       throw new CustomError(
@@ -40,14 +41,20 @@ router.post("/", async (req: Request, res: Response) => {
       req.body.socketId,
       `you have been assigned room ${roomDetails?.room_number}`
     );
+    const user = await prisma.user.create({
+      data:{
+        staffId: id,
+        role: "staff"
+      }
+    })
+
     socket?.join([`${roomAssignment.room_id.toString()}`, "staff"]);
 
-    setUser(req.body.socketId, {
-      socketId: req.body.socketId,
+    setUser(user.id, {
       role: "staff",
-      roomNumber: roomDetails!.room_number,
-      userId: result.body!.staffId,
-    });
+      roomNumber: roomAssignment.
+    })
+
     res.send(roomAssignment);
   }
 

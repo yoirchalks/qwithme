@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto";
+
 type userRole = "patient" | "staff";
 
 interface userInfo {
@@ -9,12 +11,12 @@ interface userInfo {
 
 const usersStore = new Map<string, userInfo>();
 
-export function setUser(socketId: string, info: userInfo) {
-  usersStore.set(socketId, info);
+export function setUser(uuid: string, info: userInfo) {
+  usersStore.set(uuid, info);
 }
 
-export function getUser(socketId: string) {
-  return usersStore.get(socketId);
+export function getUser(uuid: string) {
+  return usersStore.get(uuid);
 }
 
 export function getUserIdBySocket(socket: string) {
@@ -23,8 +25,8 @@ export function getUserIdBySocket(socket: string) {
   )[0].userId;
 }
 
-export function deleteUser(socketId: string) {
-  usersStore.delete(socketId);
+export function deleteUser(uuid: string) {
+  usersStore.delete(uuid);
 }
 
 export function getAllUsers() {

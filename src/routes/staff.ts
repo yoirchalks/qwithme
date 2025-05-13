@@ -36,6 +36,12 @@ router.post("/", async (req: Request, res: Response) => {
       image: bytes!,
     },
   });
+  await prisma.user.create({
+    data: {
+      role: "staff",
+      staffId: staff.id,
+    },
+  });
   const cleanedResult = cleanResult(staff, clean);
   res.send(cleanedResult);
 });
