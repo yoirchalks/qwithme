@@ -7,6 +7,7 @@ import { getIO } from "../startup/sockets";
 import { getUserById, setUser } from "../sockets/store";
 import { prisma } from "../db/prisma";
 import sendMessage from "../utils/sendMessage";
+import _ from "lodash";
 
 const router = express.Router();
 
@@ -19,7 +20,6 @@ router.post("/", async (req: Request, res: Response) => {
     );
 
   if (attempt === "doctor") {
-    
     const result = validateSignIn("staff", req.body);
     if (!result.success) {
       throw new CustomError(
@@ -41,20 +41,14 @@ router.post("/", async (req: Request, res: Response) => {
       req.body.socketId,
       `you have been assigned room ${roomDetails?.room_number}`
     );
-    const user = await prisma.user.create({
-      data:{
+
+    const user = await prisma.user.findUnique({
+      where: {
         staffId: id,
-        role: "staff"
-      }
-    })
+      },
+    });
 
-    socket?.join([`${roomAssignment.room_id.toString()}`, "staff"]);
-
-    setUser(user.id, {
-      role: "staff",
-      roomNumber: roomAssignment.
-    })
-
+    _.set(roomAssignment, "uuid", user?.id);
     res.send(roomAssignment);
   }
 

@@ -16,6 +16,31 @@ export function setupSocketIO(io: SocketIOServer) {
       },
     });
 
+    let roomId;
+
+    if (user?.role == "patient") {
+      const room = await prisma.ques.findUnique({
+        where: {
+          patient_id: user.patientId!,
+        },
+      });
+      roomId = room?.room_id;
+    } else {
+      const room = prisma.staff_rooms.findUnique({
+        where: {
+          staff_id: user?.staffId!,
+        },
+      });
+    }
+
+    const room = await prisma.rooms.findUnique({
+      where: {
+        id: roomId,
+      },
+    });
+
+    socket.join(room?.room_number!);
+
     if (!user) {
       console.log("no user found with uuid. disconnecting");
       socket.disconnect();
