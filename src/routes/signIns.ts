@@ -13,6 +13,8 @@ const router = express.Router();
 
 router.post("/", async (req: Request, res: Response) => {
   const attempt = req.body.attempt;
+  console.log(req.body);
+
   if (attempt != "doctor" && attempt != "patient")
     throw new CustomError(
       400,
