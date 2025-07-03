@@ -1,12 +1,12 @@
-import express, { Request, Response } from "express";
 import assignRoom from "../utils/signInDr";
-import validateSignIn from "../validators/signIns.validator";
 import { CustomError } from "../utils/CustomError";
-import signInPatient from "../utils/signInPatient";
+import express, { Request, Response } from "express";
 import { getIO } from "../startup/sockets";
-import { getUserById, setUser } from "../sockets/store";
+import { getUserById } from "../sockets/store";
 import { prisma } from "../db/prisma";
 import sendMessage from "../utils/sendMessage";
+import signInPatient from "../utils/signInPatient";
+import validateSignIn from "../validators/signIns.validator";
 import _ from "lodash";
 
 const router = express.Router();

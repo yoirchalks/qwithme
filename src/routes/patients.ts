@@ -40,7 +40,7 @@ router.post("/", async (req: Request, res: Response) => {
     },
   });
   if (!doctor)
-    throw new CustomError(400, `no staff member with id ${drId} found`);
+    throw new CustomError(400, `no staff member member with id ${drId} found`);
   if (doctor.position != "doctor")
     throw new CustomError(
       404,
@@ -61,7 +61,7 @@ router.post("/", async (req: Request, res: Response) => {
   await prisma.user.create({
     data: {
       role: "patient",
-      staffId: patient.id,
+      patientId: patient.id,
     },
   });
   const cleanedPatient = cleanResult(patient, clean);

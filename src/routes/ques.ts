@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 import { prisma } from "../db/prisma";
 import lateUpdate from "../utils/lateUpdate";
 import { CustomError } from "../utils/CustomError";
-import { log } from "util";
 
 const router = express.Router();
 

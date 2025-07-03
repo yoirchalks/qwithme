@@ -90,6 +90,8 @@ model user {
   staffId   Int? @unique
 
   createdAt DateTime @default(now())
+
+  @@map("users")
 }
 
 enum que_status {
