@@ -516,3 +516,235 @@ _All endpoints are prefixed with `/api`, e.g., `/api/users`._
 - Forbidden actions (e.g., trying to sign out with patients waiting) return `403 Forbidden`.
 
 ---
+
+# Socket.IO Integration Guide
+
+This guide explains how to set up and use the Socket.IO-based real-time features of the backend in your frontend application.
+
+---
+
+## 1. Server-Side Socket.IO Setup
+
+The backend uses [Socket.IO](https://socket.io/) to provide real-time communication channels.
+
+### Initialization
+
+- The server creates and attaches a Socket.IO server to the HTTP server in `src/startup/sockets.ts`:
+
+```typescript
+import { Express } from "express";
+import http from "http";
+import { Server as SocketIOServer } from "socket.io";
+import { setupSocketIO } from "../sockets/socket";
+
+let io: SocketIOServer | null = null;
+
+export default function setUpSockets(app: Express): http.Server {
+  const server = http.createServer(app);
+  io = new SocketIOServer(server, {
+    cors: {
+      origin: process.env.CORS, // Set this to your frontend's URL
+      methods: ["GET", "PUT"],
+    },
+  });
+
+  setupSocketIO(io);
+  return server;
+}
+```
+
+- The main app (`src/app.ts`) uses this setup to start the server:
+
+```typescript
+const app = express();
+const server = setUpSockets(app);
+server.listen(port, () => {
+  console.log(`server listening @ port ${port}`);
+});
+```
+
+### Event Handlers
+
+In `src/sockets/socket.ts`, the server listens for:
+
+- `connection` — on new client connection
+- `message` — handles messages sent by clients
+- `get_list` — client requests the user/patient list
+- `disconnect` — cleans up on disconnect
+
+---
+
+## 2. Frontend Socket.IO Usage
+
+### Install the Client
+
+```bash
+npm install socket.io-client
+```
+
+### Connect to the Backend
+
+```javascript
+import { io } from "socket.io-client";
+
+const socket = io("http://<SERVER_HOST>:<PORT>", {
+  transports: ["websocket"],
+  // if needed:
+  // withCredentials: true,
+});
+```
+
+### Join Rooms and Handle Events
+
+#### Example: Join Room and Listen for Events
+
+```javascript
+// Listen to generic events
+socket.on("connect", () => {
+  console.log("Connected to server:", socket.id);
+});
+
+socket.on("joined_que", (msg) => {
+  alert(msg); // Or handle in your app
+});
+
+socket.on("send_patients", (patients) => {
+  // Update your UI
+  console.log(patients);
+});
+
+socket.on("message", (data) => {
+  // Handle chat or notifications
+  console.log(data);
+});
+
+// Request to get the patients/users list
+socket.emit("get_list");
+
+// Clean up
+socket.on("disconnect", () => {
+  console.log("Disconnected");
+});
+```
+
+#### Example: Send a Message
+
+```javascript
+socket.emit("message", { text: "Hello, server!" });
+```
+
+---
+
+## 3. Real-World Use Cases
+
+### Queue Management (Patient/Staff)
+
+- When a patient or staff signs in successfully, the backend will:
+  - Assign them to a room (staff)
+  - Place them in a queue (patient)
+  - Notify the frontend via events like `joined_que`, with queue number and wait time.
+
+Example event data received:
+
+```
+"You are number 2 in line for room 101. Expected wait time is 30 minutes"
+```
+
+### Room Assignment (Staff)
+
+- Staff sockets join a room channel and get a notification when assigned:
+  ```javascript
+  socket.join([`${roomAssignment.room_id}`, "staff"]);
+  socket.send(`you have been assigned room ${roomDetails.room_number}`);
+  ```
+
+### Error and Status Notifications
+
+- If an action fails (e.g., trying to sign in when no room is assigned), the server sends a direct message:
+  ```javascript
+  socket.emit(
+    "joined_que",
+    "Your staff member hasn't been allocated a room. Please try again later or contact reception."
+  );
+  ```
+
+---
+
+## 4. Best Practices
+
+- Always handle `disconnect` events on the frontend to update UI accordingly.
+- Use unique socket IDs to identify users in the store.
+- Use rooms for group notifications (e.g., all patients in a room).
+- Use custom events (`joined_que`, `send_patients`, etc.) for domain-specific updates.
+- Make sure your frontend domain is allowed via CORS (`process.env.CORS` in backend).
+- Use secure WebSockets (`wss://`) in production.
+
+---
+
+## 5. Example: React Integration
+
+```javascript
+import { useEffect } from "react";
+import { io } from "socket.io-client";
+
+function useSocket() {
+  useEffect(() => {
+    const socket = io("http://localhost:3000");
+    socket.on("joined_que", (msg) => alert(msg));
+    socket.on("disconnect", () => alert("Disconnected"));
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+}
+```
+
+---
+
+## 6. Advanced: Custom Client Events
+
+You can add more event handlers on both backend and frontend as needed:
+
+**Backend:**
+
+```typescript
+socket.on("custom_event", (payload) => {
+  // handle
+  socket.emit("custom_response", { ok: true });
+});
+```
+
+**Frontend:**
+
+```javascript
+socket.emit('custom_event', { ... });
+socket.on('custom_response', data => { ... });
+```
+
+---
+
+## 7. Clean Shutdown
+
+Backend listens for `SIGINT` to close all sockets cleanly:
+
+```typescript
+process.on("SIGINT", () => {
+  io.close(() => process.exit(0));
+});
+```
+
+---
+
+## 8. Security
+
+- Always authenticate users before trusting socket events.
+- Consider implementing authentication tokens or session checks in production.
+- Validate all incoming data on the backend.
+
+---
+
+## References
+
+- [Socket.IO Docs](https://socket.io/docs/v4/client-api/)
+- See `src/sockets/socket.ts`, `src/startup/sockets.ts`, and `src/routes/signIns.ts` for more.

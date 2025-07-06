@@ -13,7 +13,6 @@ const router = express.Router();
 
 router.post("/", async (req: Request, res: Response) => {
   const attempt = req.body.attempt;
-  console.log(req.body);
 
   if (attempt != "doctor" && attempt != "patient")
     throw new CustomError(
@@ -88,8 +87,8 @@ router.post("/", async (req: Request, res: Response) => {
 router.put("/:id", async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
 
-  const io = getIO();
-  const socket = io.sockets.sockets.get(getUserById(id).socketId);
+  // const io = getIO();
+  // const socket = io.sockets.sockets.get(getUserById(id).socketId);
 
   const signIn = await prisma.staff_rooms.findFirst({
     where: {
@@ -102,8 +101,8 @@ router.put("/:id", async (req: Request, res: Response) => {
   });
 
   if (!signIn) {
-    socket?.send("you are not currently logged in");
-    throw new CustomError(400, "you are not currently logged in");
+    // socket?.send("you are not currently logged in");
+    res.send("you are not logged in");
   }
 
   const pendingQues = await prisma.ques.findMany({
@@ -113,13 +112,13 @@ router.put("/:id", async (req: Request, res: Response) => {
     },
   });
   if (pendingQues.length) {
-    socket?.send(
-      `You can't sign out. You still have ${pendingQues.length} ${
-        pendingQues.length > 1 ? "patients" : "patient"
-      } to see.`
-    );
+    // socket?.send(
+    //   `You can't sign out. You still have ${pendingQues.length} ${
+    //     pendingQues.length > 1 ? "patients" : "patient"
+    //   } to see.`
+    // );
     throw new CustomError(
-      403,
+      422,
       `Unable to sign out whilst patients are waiting`
     );
   }
@@ -133,7 +132,7 @@ router.put("/:id", async (req: Request, res: Response) => {
     },
   });
 
-  socket?.send("signed out");
+  // socket?.send("signed out");
 
   res.send(signOut);
 });
