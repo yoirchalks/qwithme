@@ -55,7 +55,8 @@ router.post("/", async (req: Request, res: Response) => {
     });
 
     _.set(roomAssignment, "uuid", user?.id);
-    res.send(roomAssignment);
+    const responseResult = { ...roomAssignment, image };
+    res.send(responseResult);
   }
 
   if (attempt === "patient") {
