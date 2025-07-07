@@ -1,8 +1,6 @@
 import assignRoom from "../utils/signInDr";
 import { CustomError } from "../utils/CustomError";
 import express, { Request, Response } from "express";
-import { getIO } from "../startup/sockets";
-import { getUserById } from "../sockets/store";
 import { prisma } from "../db/prisma";
 import sendMessage from "../utils/sendMessage";
 import signInPatient from "../utils/signInPatient";
@@ -67,11 +65,25 @@ router.post("/", async (req: Request, res: Response) => {
       req.body.patientId,
       req.body.socketId
     );
+    const imageResult = await prisma.patients.findUnique({
+      where: {
+        id: req.body.patientId,
+      },
+      select: {
+        image: true,
+      },
+    });
     const roomDetails = await prisma?.rooms.findUnique({
       where: {
         id: que.room_id,
       },
     });
+
+    const image = imageResult?.image
+      ? Buffer.from(imageResult?.image).toString("base64")
+      : null;
+
+    const updatedQue = { ...que, image };
 
     const socket = sendMessage(
       req.body.socketId,
@@ -80,7 +92,7 @@ router.post("/", async (req: Request, res: Response) => {
       }.\n Expected wait time is ${que.queue_number * 15} minutes`
     );
     socket?.join(que.room_id.toString());
-    res.send(que);
+    res.send(updatedQue);
   }
 });
 

@@ -1,69 +1,66 @@
-import { randomUUID } from "crypto";
+type UserRole = "patient" | "staff";
 
-type userRole = "patient" | "staff";
-
-interface userInfo {
+export interface UserInfo {
   userId: number;
-  role: userRole | null;
-  socketId: string;
+  role: UserRole;
   roomNumber: string | null;
+  socketId: string;
 }
 
-const usersStore = new Map<string, userInfo>();
+const userIdToUser = new Map<number, UserInfo>();
+const socketIdToUserId = new Map<string, number>();
 
-export function setUser(uuid: string, info: userInfo) {
-  usersStore.set(uuid, info);
+export function setUser(socketId: string, user: Omit<UserInfo, "socketId">) {
+  const existing = userIdToUser.get(user.userId);
+  if (existing) {
+    socketIdToUserId.delete(existing.socketId);
+  }
+  const userInfo: UserInfo = { ...user, socketId };
+  userIdToUser.set(user.userId, userInfo);
+  socketIdToUserId.set(socketId, user.userId);
 }
 
-export function getUser(uuid: string) {
-  return usersStore.get(uuid);
+export function removeSocket(socketId: string) {
+  const userId = socketIdToUserId.get(socketId);
+  if (userId !== undefined) {
+    userIdToUser.delete(userId);
+    socketIdToUserId.delete(socketId);
+  }
 }
 
-export function getUserIdBySocket(socket: string) {
-  return Array.from(usersStore.values()).filter(
-    (user) => user.socketId === socket
-  )[0].userId;
+export function removeUser(userId: number) {
+  const user = userIdToUser.get(userId);
+  if (user) {
+    socketIdToUserId.delete(user.socketId);
+    userIdToUser.delete(userId);
+  }
 }
 
-export function deleteUser(uuid: string) {
-  usersStore.delete(uuid);
+export function getUserBySocket(socketId: string): UserInfo | undefined {
+  const userId = socketIdToUserId.get(socketId);
+  if (userId === undefined) return undefined;
+  return userIdToUser.get(userId);
 }
 
-export function getAllUsers() {
-  return Array.from(usersStore.values());
+export function getUserById(userId: number): UserInfo | undefined {
+  return userIdToUser.get(userId);
 }
 
-export function deleteAllUsers() {
-  return usersStore.clear();
+export function getAllUsers(): UserInfo[] {
+  return Array.from(userIdToUser.values());
 }
 
-export function getUsersByRole(role: userRole): userInfo[] {
-  return Array.from(usersStore.values()).filter((user) => user.role === role);
+export function getUsersByRole(role: UserRole): UserInfo[] {
+  return Array.from(userIdToUser.values()).filter((user) => user.role === role);
 }
 
-export function getStaffById(id: number) {
-  return getUsersByRole("staff").filter((user) => user.userId === id)[0];
-}
-
-export function getPatientById(id: number) {
-  return getUsersByRole("patient").filter((user) => user.userId === id)[0];
-}
-
-export function getUserById(id: number) {
-  return getAllUsers().filter((user) => user.userId === id)[0];
-}
-
-export function getUsersByRoom(roomNumber: string): userInfo[] {
-  return Array.from(usersStore.values()).filter(
+export function getUsersByRoom(roomNumber: string): UserInfo[] {
+  return Array.from(userIdToUser.values()).filter(
     (user) => user.roomNumber === roomNumber
   );
 }
 
-export function getUsersByRoomAndRole(
-  roomNumber: string,
-  role: userRole
-): userInfo[] {
-  return Array.from(usersStore.values()).filter(
-    (user) => user.roomNumber === roomNumber && user.role === role
-  );
+export function clearStore() {
+  userIdToUser.clear();
+  socketIdToUserId.clear();
 }

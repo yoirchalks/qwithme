@@ -44,6 +44,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 });
 
 router.put("/", async (req: Request, res: Response) => {
+  //TODO: need to get some sort of id here
   const que = await prisma.ques.findFirst({
     where: {
       status: "waiting",
