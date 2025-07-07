@@ -6,6 +6,7 @@ import sendMessage from "../utils/sendMessage";
 import signInPatient from "../utils/signInPatient";
 import validateSignIn from "../validators/signIns.validator";
 import _ from "lodash";
+import getImageString from "../utils/getImageString";
 
 const router = express.Router();
 
@@ -27,6 +28,12 @@ router.post("/", async (req: Request, res: Response) => {
       );
     }
     const id = req.body.staffId;
+    const imageResult = await prisma.staff.findUnique({
+      where: { id },
+      select: { image: true },
+    });
+
+    const image = imageResult?.image ? getImageString(imageResult.image) : null;
 
     const roomAssignment = await assignRoom(id);
 
@@ -79,9 +86,7 @@ router.post("/", async (req: Request, res: Response) => {
       },
     });
 
-    const image = imageResult?.image
-      ? Buffer.from(imageResult?.image).toString("base64")
-      : null;
+    const image = imageResult?.image ? getImageString(imageResult.image) : null;
 
     const updatedQue = { ...que, image };
 
