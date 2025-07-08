@@ -46,7 +46,26 @@ export default async function (
     throw new CustomError(404, `no room allocated to staff with id ${staffId}`);
   }
 
-  const prevQueNumber = await prisma.ques.count();
+  const prevQueNumber = await prisma.ques.count({
+    where: {
+      status: "waiting",
+    },
+  });
+
+  const prevQue = await prisma.ques.findFirst({
+    where: {
+      patient_id: patientId,
+      status: { in: ["being_seen", "waiting"] },
+    },
+  });
+
+  if (prevQue) {
+    throw new CustomError(
+      409,
+      `Patient with id ${patientId} is already in que`
+    );
+    return;
+  }
 
   const que = await prisma.ques.create({
     data: {

@@ -20,15 +20,16 @@ export function setupSocketIO(io: SocketIOServer) {
     let roomId: number | undefined;
 
     if (user?.role === "patient") {
-      const room = await prisma.ques.findUnique({
+      const room = await prisma.ques.findFirst({
         where: {
           patient_id: user.patientId!,
+          status: "waiting",
         },
       });
       roomId = room?.room_id;
     } else if (user?.role === "staff") {
       // CHANGED: fix missing await and role check
-      const staffRoom = await prisma.staff_rooms.findUnique({
+      const staffRoom = await prisma.staff_rooms.findFirst({
         where: {
           staff_id: user.staffId!,
         },

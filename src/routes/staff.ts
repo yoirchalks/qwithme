@@ -4,6 +4,7 @@ import { CustomError } from "../utils/CustomError";
 import validateStaff from "../validators/staff.validator";
 import { cleanResult, cleanResults } from "../utils/cleanResults";
 import cleanInputData from "../utils/cleanInputData";
+import { getBufferFromReqBody } from "../utils/imageFromAndToDb";
 
 const router = express.Router();
 const clean = ["created_at", "updated_at"];
@@ -85,9 +86,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 
   const updateData: Record<string, any> = { ...result.body! };
 
-  if (typeof req.body.image === "string" && req.body.image.length > 0) {
-    updateData.image = Buffer.from(req.body.image, "base64");
-  }
+  const image = getBufferFromReqBody(req);
 
   const staff = await prisma.staff.update({
     where: {

@@ -6,7 +6,7 @@ import sendMessage from "../utils/sendMessage";
 import signInPatient from "../utils/signInPatient";
 import validateSignIn from "../validators/signIns.validator";
 import _ from "lodash";
-import getImageString from "../utils/getImageString";
+import { getImageString } from "../utils/imageFromAndToDb";
 
 const router = express.Router();
 
@@ -37,7 +37,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     const roomAssignment = await assignRoom(id);
 
-    const roomDetails = await prisma?.rooms.findUnique({
+    const roomDetails = await prisma?.rooms.findFirst({
       where: {
         id: roomAssignment.room_id,
       },
@@ -48,7 +48,7 @@ router.post("/", async (req: Request, res: Response) => {
       `you have been assigned room ${roomDetails?.room_number}`
     );
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: {
         staffId: id,
       },
@@ -73,7 +73,7 @@ router.post("/", async (req: Request, res: Response) => {
       req.body.patientId,
       req.body.socketId
     );
-    const imageResult = await prisma.patients.findUnique({
+    const imageResult = await prisma.patients.findFirst({
       where: {
         id: req.body.patientId,
       },
@@ -81,7 +81,7 @@ router.post("/", async (req: Request, res: Response) => {
         image: true,
       },
     });
-    const roomDetails = await prisma?.rooms.findUnique({
+    const roomDetails = await prisma?.rooms.findFirst({
       where: {
         id: que.room_id,
       },
@@ -103,6 +103,7 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 router.put("/:id", async (req: Request, res: Response) => {
+  //sign out route
   const id = parseInt(req.params.id);
 
   // const io = getIO();
@@ -141,12 +142,17 @@ router.put("/:id", async (req: Request, res: Response) => {
     );
   }
 
+  const roomId = await prisma.staff_rooms.findFirst({
+    where: { staff_id: id },
+    select: { id: true },
+  });
+
   const signOut = await prisma.staff_rooms.update({
     data: {
       sign_out_time: new Date(),
     },
     where: {
-      staff_id: id,
+      id: roomId?.id,
     },
   });
 

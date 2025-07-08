@@ -30,7 +30,7 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.get("/:id", async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
-  const que = await prisma.ques.findUnique({
+  const que = await prisma.ques.findFirst({
     where: {
       id: id,
     },
@@ -76,7 +76,7 @@ router.put("/", async (req: Request, res: Response) => {
     },
   });
 
-  const waitingPatient = await prisma.ques.findUnique({
+  const waitingPatient = await prisma.ques.findFirst({
     where: {
       id: que.id + 1,
     },
@@ -107,17 +107,18 @@ router.put("/", async (req: Request, res: Response) => {
 router.put("/:id", async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
 
-  const que = await prisma.ques.findUnique({
+  const que = await prisma.ques.findFirst({
     where: {
       patient_id: id,
+      status: "waiting",
     },
   });
   if (!que)
-    throw new CustomError(404, `no que found for patient with id ${id}`);
+    throw new CustomError(404, `no active que found for patient with id ${id}`);
 
   const cancelledQue = await prisma.ques.update({
     where: {
-      patient_id: id,
+      id: que.id,
     },
     data: {
       status: "cancelled",
