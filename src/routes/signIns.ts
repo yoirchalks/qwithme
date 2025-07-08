@@ -83,7 +83,7 @@ router.post("/", async (req: Request, res: Response) => {
     });
     const roomDetails = await prisma?.rooms.findFirst({
       where: {
-        id: que.room_id,
+        id: que!.room_id,
       },
     });
 
@@ -91,13 +91,13 @@ router.post("/", async (req: Request, res: Response) => {
 
     const updatedQue = { ...que, image };
 
-    const socket = sendMessage(
-      req.body.socketId,
-      `You are number ${que.queue_number} in line for room ${
-        roomDetails?.room_number
-      }.\n Expected wait time is ${que.queue_number * 15} minutes`
-    );
-    socket?.join(que.room_id.toString());
+    // const socket = sendMessage(
+    //   req.body.socketId,
+    //   `You are number ${que.queue_number} in line for room ${
+    //     roomDetails?.room_number
+    //   }.\n Expected wait time is ${que.queue_number * 15} minutes`
+    // );
+    // socket?.join(que.room_id.toString());
     res.send(updatedQue);
   }
 });
