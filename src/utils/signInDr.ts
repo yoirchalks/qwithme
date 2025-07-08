@@ -1,14 +1,29 @@
 import { prisma } from "../db/prisma";
 import { CustomError } from "./CustomError";
 
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
 export default async function (drId: number) {
   const unassignedRoom = await prisma.rooms.findFirst({
     where: {
-      staff_rooms: {
-        none: {
-          sign_out_time: null, //TODO: also not correct. only returns room that was signed in and then out. will not return room that is not yet signed in.
+      OR: [
+        {
+          staff_rooms: {
+            none: {
+              sign_in_date: today,
+            },
+          },
         },
-      },
+        {
+          staff_rooms: {
+            some: {
+              sign_in_date: today,
+              sign_out_time: { not: null },
+            },
+          },
+        },
+      ],
     },
   });
 
