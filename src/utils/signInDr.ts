@@ -5,7 +5,9 @@ export default async function (drId: number) {
   const unassignedRoom = await prisma.rooms.findFirst({
     where: {
       staff_rooms: {
-        none: {},
+        none: {
+          sign_out_time: null,
+        },
       },
     },
   });
