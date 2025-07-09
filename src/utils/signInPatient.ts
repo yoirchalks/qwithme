@@ -72,7 +72,6 @@ export default async function (
       patient_id: patientId,
       staff_id: staffId,
       room_id: roomId.room_id,
-      queue_number: prevQueNumber + 1,
     },
   });
 

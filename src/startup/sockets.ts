@@ -10,7 +10,7 @@ export default function setUpSockets(app: Express): http.Server {
   const server = http.createServer(app);
   io = new SocketIOServer(server, {
     cors: {
-      origin: process.env.CORS,
+      origin: "http://localhost:5173",
       methods: ["GET", "PUT"],
     },
   });

@@ -7,7 +7,7 @@ export default (staffId: number, message: string) => {
   console.log(staff);
 
   if (staff && staff.roomNumber) {
-    io.to(staff.roomNumber).emit("message", message);
+    io.to(staff.roomNumber).emit("room_message", message);
   } else {
     console.warn(`Staff with ID ${staffId} not found or not in a room.`);
   }

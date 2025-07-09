@@ -31,7 +31,6 @@ model ques {
   patient_id     Int         
   staff_id       Int
   room_id        Int
-  queue_number   Int         @unique
   status         que_status? @default(waiting)
   sign_in_time   DateTime?   @default(now()) @db.Timestamptz(6)
   started_time   DateTime?   @db.Timestamptz(6)

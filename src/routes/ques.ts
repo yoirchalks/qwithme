@@ -76,30 +76,30 @@ router.put("/", async (req: Request, res: Response) => {
     },
   });
 
-  const waitingPatient = await prisma.ques.findFirst({
-    where: {
-      id: que.id + 1,
-    },
-  });
+  // const waitingPatient = await prisma.ques.findFirst({
+  //   where: {
+  //     id: que.id + 1,
+  //   },
+  // });
 
-  const delayInMin =
-    (nextPatient.started_time!.getTime() +
-      nextPatient.queue_number * 1000 * 60 * 15 -
-      nextPatient.sign_in_time!.getTime()) /
-    (1000 * 60);
+  // const delayInMin =
+  //   (nextPatient.started_time!.getTime() +
+  //     nextPatient.queue_number * 1000 * 60 * 15 -
+  //     nextPatient.sign_in_time!.getTime()) /
+  //   (1000 * 60);
 
-  if (delayInMin > 2 && waitingPatient) {
-    const staff = await prisma.staff.findUnique({
-      where: {
-        id: nextPatient.staff_id,
-      },
-    });
+  // if (delayInMin > 2 && waitingPatient) {
+  //   const staff = await prisma.staff.findUnique({
+  //     where: {
+  //       id: nextPatient.staff_id,
+  //     },
+  //   });
 
-    lateUpdate(
-      nextPatient.staff_id,
-      `${staff?.full_name} is running ${delayInMin} late. We are sorry for any inconvenience.`
-    );
-  }
+  //   lateUpdate(
+  //     nextPatient.staff_id,
+  //     `${staff?.full_name} is running ${delayInMin} late. We are sorry for any inconvenience.`
+  //   );
+  // }
 
   res.send(nextPatient);
 });
