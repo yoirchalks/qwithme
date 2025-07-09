@@ -1,14 +1,14 @@
 type UserRole = "patient" | "staff";
 
 export interface UserInfo {
-  userId: number;
+  userId: string;
   role: UserRole;
   roomNumber: string | null;
   socketId: string;
 }
 
-const userIdToUser = new Map<number, UserInfo>();
-const socketIdToUserId = new Map<string, number>();
+const userIdToUser = new Map<string, UserInfo>();
+const socketIdToUserId = new Map<string, string>();
 
 export function setUser(socketId: string, user: Omit<UserInfo, "socketId">) {
   const existing = userIdToUser.get(user.userId);
@@ -28,7 +28,7 @@ export function removeSocket(socketId: string) {
   }
 }
 
-export function removeUser(userId: number) {
+export function removeUser(userId: string) {
   const user = userIdToUser.get(userId);
   if (user) {
     socketIdToUserId.delete(user.socketId);
@@ -42,7 +42,7 @@ export function getUserBySocket(socketId: string): UserInfo | undefined {
   return userIdToUser.get(userId);
 }
 
-export function getUserById(userId: number): UserInfo | undefined {
+export function getUserById(userId: string): UserInfo | undefined {
   return userIdToUser.get(userId);
 }
 

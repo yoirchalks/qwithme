@@ -1,5 +1,5 @@
 import { Server as SocketIOServer } from "socket.io";
-import { clearStore, getAllUsers, setUser, removeSocket } from "./store"; // CHANGED: import new API
+import { clearStore, getAllUsers, setUser, removeSocket } from "./store";
 import { prisma } from "../db/prisma";
 
 export function setupSocketIO(io: SocketIOServer) {
@@ -71,6 +71,66 @@ export function setupSocketIO(io: SocketIOServer) {
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
       removeSocket(socket.id); // CHANGED: use removeSocket, not deleteUser
+    });
+
+    socket.on("on_connected", async (socketUuid) => {
+      console.log(socketUuid);
+
+      const user = await prisma.user.findUnique({
+        where: { id: socketUuid },
+      });
+
+      if (user?.patientId) {
+        const queueDetails = await prisma.ques.findFirst({
+          where: {
+            patient_id: user.patientId,
+            status: { in: ["waiting", "being_seen"] },
+          },
+        });
+
+        const peopleInLine = await prisma.ques.count({
+          where: {
+            room_id: queueDetails?.room_id,
+            status: "waiting",
+            NOT: { patient_id: user.patientId },
+          },
+        });
+
+        if (peopleInLine === 0) {
+          socket.emit(
+            "user_message",
+            "your a first in line. Dr will call you shortly"
+          );
+        } else {
+          socket.emit(
+            "user_message",
+            `You are ${peopleInLine} in line. \nExpected wait is ${
+              peopleInLine * 15
+            } min.`
+          );
+        }
+      }
+
+      if (user?.staffId) {
+        const allocatedRoom = await prisma.staff_rooms.findFirst({
+          where: {
+            staff_id: user.staffId,
+            sign_in_time: { not: null },
+            sign_out_time: null,
+          },
+        });
+        if (!allocatedRoom) {
+          socket.emit("user_message", "system hasn't found an allocated room");
+        }
+        const room = await prisma.rooms.findUnique({
+          where: { id: allocatedRoom?.room_id },
+          select: { room_number: true },
+        });
+        socket.emit(
+          "user_message",
+          `You have been assigned room ${room?.room_number}`
+        );
+      }
     });
   });
 
