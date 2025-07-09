@@ -21,9 +21,9 @@ export function errorHandler(
   }
 
   if (err.status && err.message) {
-    res.status(err.status).send(err.message);
+    res.status(err.status).json({ message: err.message });
     return;
   }
 
-  res.status(500).send(`Internal server error; ${err}`);
+  res.status(500).send(err);
 }
