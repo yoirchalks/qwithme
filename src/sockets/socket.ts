@@ -52,10 +52,9 @@ export function setupSocketIO(io: SocketIOServer) {
     if (!user) {
       console.log("no user found with uuid. disconnecting");
       socket.disconnect();
-      return; // CHANGED: ensure early return after disconnect
+      return;
     }
 
-    // CHANGED: setUser now expects (socketId, userInfo) with enforced single connection
     setUser(socket.id, {
       userId: uuid,
       role: user.role,
