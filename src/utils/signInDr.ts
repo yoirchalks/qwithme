@@ -4,6 +4,9 @@ import { CustomError } from "./CustomError";
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+
 export default async function (drId: number) {
   const unassignedRoom = await prisma.rooms.findFirst({
     where: {
@@ -11,14 +14,20 @@ export default async function (drId: number) {
         {
           staff_rooms: {
             none: {
-              sign_in_date: today,
+              sign_in_time: {
+                lt: tomorrow,
+                gte: today,
+              },
             },
           },
         },
         {
           staff_rooms: {
             some: {
-              sign_in_date: today,
+              sign_in_time: {
+                gte: today,
+                lt: tomorrow,
+              },
               sign_out_time: { not: null },
             },
           },
@@ -26,6 +35,8 @@ export default async function (drId: number) {
       ],
     },
   });
+
+  console.log("unassigned room: ", unassignedRoom?.id);
 
   if (!unassignedRoom) throw new CustomError(404, `no available rooms found`);
 

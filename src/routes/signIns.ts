@@ -12,6 +12,8 @@ import { getUserById } from "../sockets/store";
 const router = express.Router();
 
 router.post("/", async (req: Request, res: Response) => {
+  console.log("called");
+
   const attempt = req.body.attempt;
 
   if (attempt != "doctor" && attempt != "patient")
@@ -51,7 +53,6 @@ router.post("/", async (req: Request, res: Response) => {
     });
 
     _.set(roomAssignment, "uuid", user?.id);
-    console.log(user);
 
     const responseResult = { ...roomAssignment, image };
     res.send(responseResult);
@@ -93,8 +94,6 @@ router.post("/", async (req: Request, res: Response) => {
     const image = imageResult?.image ? getImageString(imageResult.image) : null;
 
     const updatedQue = { ...que, image };
-    console.log(user!.id);
-
     _.set(updatedQue, "uuid", user?.id);
 
     res.send(updatedQue);

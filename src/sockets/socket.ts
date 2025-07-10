@@ -8,7 +8,7 @@ export function setupSocketIO(io: SocketIOServer) {
     if (!uuid) {
       console.log("no uuid provided. disconnecting");
       socket.disconnect();
-      return; // CHANGED: ensure early return after disconnect
+      return;
     }
 
     const user = await prisma.user.findUnique({
@@ -28,7 +28,6 @@ export function setupSocketIO(io: SocketIOServer) {
       });
       roomId = room?.room_id;
     } else if (user?.role === "staff") {
-      // CHANGED: fix missing await and role check
       const staffRoom = await prisma.staff_rooms.findFirst({
         where: {
           staff_id: user.staffId!,
@@ -62,6 +61,7 @@ export function setupSocketIO(io: SocketIOServer) {
     });
 
     console.log("User connected:", socket.id);
+    socket.emit("ready");
 
     socket.on("get_list", () => {
       socket.emit("send_patients", getAllUsers());
@@ -69,14 +69,14 @@ export function setupSocketIO(io: SocketIOServer) {
 
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
-      removeSocket(socket.id); // CHANGED: use removeSocket, not deleteUser
+      removeSocket(socket.id);
     });
 
-    socket.on("on_connected", async (socketUuid) => {
-      console.log(socketUuid);
+    socket.on("on_connected", async (usersUuid) => {
+      console.log("uuid", usersUuid);
 
       const user = await prisma.user.findUnique({
-        where: { id: socketUuid },
+        where: { id: usersUuid },
       });
 
       if (user?.patientId) {
@@ -135,7 +135,7 @@ export function setupSocketIO(io: SocketIOServer) {
 
   process.on("SIGINT", () => {
     console.log("Server shutting down...");
-    clearStore(); // CHANGED: use clearStore instead of deleteAllUsers
+    clearStore();
     io.close(() => {
       console.log("Socket server closed");
       process.exit(0);
