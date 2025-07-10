@@ -98,12 +98,12 @@ export function setupSocketIO(io: SocketIOServer) {
         if (peopleInLine === 0) {
           socket.emit(
             "user_message",
-            "your a first in line. Dr will call you shortly"
+            "you are first in line. Dr will call you shortly"
           );
         } else {
           socket.emit(
             "user_message",
-            `You are ${peopleInLine} in line. \nExpected wait is ${
+            `You are number ${peopleInLine} in line. \nExpected wait is ${
               peopleInLine * 15
             } min.`
           );
