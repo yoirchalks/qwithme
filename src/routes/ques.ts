@@ -43,12 +43,31 @@ router.get("/:id", async (req: Request, res: Response) => {
   res.send(que);
 });
 
-router.put("/", async (req: Request, res: Response) => {
-  //TODO: need to get some sort of id here
+router.put("/:id", async (req: Request, res: Response) => {
+  const staffId = parseInt(req.params.id)
+  const today = new Date()
+  today.setHours(0,0,0,0,)
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate()+1)
+  const allocatedRoom = await prisma.staff_rooms.findFirst({
+    where: {
+      staff_id: staffId,
+      sign_in_time:{
+        gte: today,
+        lt: tomorrow
+      },
+      sign_out_time: null
+    },
+    select: {room_id: true}
+  })
   const que = await prisma.ques.findFirst({
     where: {
       status: "waiting",
+      room_id: allocatedRoom?.room_id
     },
+    orderBy:{
+      sign_in_time: "asc"
+    }
   });
 
   if (!que) {
@@ -76,11 +95,17 @@ router.put("/", async (req: Request, res: Response) => {
     },
   });
 
-  // const waitingPatient = await prisma.ques.findFirst({
-  //   where: {
-  //     id: que.id + 1,
-  //   },
-  // });
+  const waitingPatient = await prisma.ques.findFirst({
+    where: {
+      id: que.id + 1,
+    },
+  });
+
+  const peopleWaiting = await prisma.ques.count({
+    where:{
+      room_id:
+    }
+  })
 
   // const delayInMin =
   //   (nextPatient.started_time!.getTime() +
