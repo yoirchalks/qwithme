@@ -10,7 +10,7 @@ export default function setUpSockets(app: Express): http.Server {
   const server = http.createServer(app);
   io = new SocketIOServer(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: "https://clinic-app-e74u.onrender.com",
       methods: ["GET", "PUT"],
     },
   });
