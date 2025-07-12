@@ -3,6 +3,7 @@ import { prisma } from "../db/prisma";
 import lateUpdate from "../utils/lateUpdate";
 import { CustomError } from "../utils/CustomError";
 import sendMessage from "../utils/sendMessage";
+import { removeUser } from "../sockets/store";
 
 const router = express.Router();
 
@@ -109,6 +110,7 @@ router.put("/:id", async (req: Request, res: Response) => {
     select: { id: true },
   });
   sendMessage(nextPatientUuid!.id, `Your doctor is  ready to see you.`);
+  removeUser(nextPatientUuid!.id); //prevent patient being seen getting delayed messages
 
   const peopleWaiting = await prisma.ques.count({
     where: {
