@@ -1,7 +1,7 @@
 import { getUserById } from "../sockets/store";
 import { getIO } from "../startup/sockets";
 
-export default (staffId: number, message: string) => {
+export default (staffId: string, message: string) => {
   const io = getIO();
   const staff = getUserById(staffId);
   console.log(staff);
