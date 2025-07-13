@@ -12,7 +12,7 @@ function routes(app: Express): void {
   app.use("/api/ques", quesRoute);
   app.use("/api/signIns", signInRoute);
   app.use("/api/rooms", roomsRouter);
-  app.use("api/healthCheck", healthCheck);
+  app.use("/api/healthCheck", healthCheck);
 }
 
 export default routes;
