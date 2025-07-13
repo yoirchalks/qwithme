@@ -103,7 +103,7 @@ export function setupSocketIO(io: SocketIOServer) {
         } else {
           socket.emit(
             "user_message",
-            `You are number ${peopleInLine} in line. \nExpected wait is ${
+            `You are number ${peopleInLine + 1} in line. \nExpected wait is ${
               peopleInLine * 15
             } min.`
           );
