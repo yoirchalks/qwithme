@@ -130,7 +130,7 @@ router.put("/:id", async (req: Request, res: Response) => {
       nextPatient.sign_in_time!.getTime()) /
     (1000 * 60);
 
-    delayInMin = +delayInMin.toFixed(0)
+  delayInMin = +delayInMin.toFixed(0);
 
   if (delayInMin > 2 && peopleWaiting !== 0) {
     const staff = await prisma.staff.findUnique({
@@ -139,11 +139,12 @@ router.put("/:id", async (req: Request, res: Response) => {
       },
     });
 
-    const messageText = (delayInMin===1)? `${delayInMin} minute`: `${delayInMin} minutes`
+    const messageText =
+      delayInMin === 1 ? `${delayInMin} minute` : `${delayInMin} minutes`;
 
     lateUpdate(
       staffUuid!.id,
-      `Dr ${staff?.full_name} is running ${delayInMin != 1? delayInMin} late. We are sorry for any inconvenience.`
+      `Dr ${staff?.full_name} is running ${messageText} late. We are sorry for any inconvenience.`
     );
   }
 
